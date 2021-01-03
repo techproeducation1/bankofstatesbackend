@@ -7,18 +7,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 	
 	@GetMapping("/")
-	public String home() {
-		return "Hello world";
-	}
-	
-	@GetMapping("/signIn")
-	public String signIn() {
-		return "Logged In ";
-	}
-	
-	@GetMapping("/signUp")
-	public String signUp() {
-		return "Register here";
-	}
+    public String home() {
+        return ("<h1>Home Page</h1>");
+    }
+
+    @GetMapping("/user")
+    public String user() {
+        return ("<h1>User Page</h1>");
+    }
+
+    @GetMapping("/admin")
+    public String admin() {
+        return ("<h1>Admin Page</h1>");
+    }
 
 }
