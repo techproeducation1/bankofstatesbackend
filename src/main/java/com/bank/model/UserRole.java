@@ -9,11 +9,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "user_role")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserRole {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,8 +34,5 @@ public class UserRole {
 	public UserRole(User user, Role role) {
 		this.user = user;
 		this.role = role;
-	}
-
-	public UserRole() {
 	}
 }

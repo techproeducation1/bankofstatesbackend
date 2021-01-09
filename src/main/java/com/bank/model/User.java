@@ -18,17 +18,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
-@Data
+@Getter
+@Setter
 @ToString
 @Entity
+@NoArgsConstructor
 public class User implements UserDetails {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "userId", nullable = false, updatable = false)	 
+	@Column(name = "userId", nullable = false, updatable = false)
 	private Long userId;
 	private String username;
 	private String password;
@@ -39,8 +43,16 @@ public class User implements UserDetails {
 	private String phone;
 	private boolean enabled = true;
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JsonIgnore	 
+	@JsonIgnore
 	private Set<UserRole> userRoles = new HashSet<>();
+
+	public User(String firstName, String lastName , String username, String email, String password) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.username = username;
+		this.email = email;
+		this.password = password;
+	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
