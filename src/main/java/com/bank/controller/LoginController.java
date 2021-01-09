@@ -93,5 +93,4 @@ public class LoginController {
 		response.setSuccess(true);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-
 }
