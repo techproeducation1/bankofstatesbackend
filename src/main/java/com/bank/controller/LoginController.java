@@ -29,6 +29,7 @@ import com.bank.request.LoginForm;
 import com.bank.request.SignUpForm;
 import com.bank.response.LoginResponse;
 import com.bank.response.Response;
+import com.bank.service.AccountService;
 import com.bank.service.UserService;
 import com.bank.util.JwtUtil;
 
@@ -48,6 +49,9 @@ public class LoginController {
 	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	AccountService accountService;
 
 	@Autowired
 	PasswordEncoder encoder;
@@ -88,7 +92,7 @@ public class LoginController {
 		}
 
 		// Creating user's account
-		User user = new User(signUpRequest.getFirsName(), signUpRequest.getLastName(), signUpRequest.getUsername(),
+		User user = new User(signUpRequest.getFirstName(), signUpRequest.getLastName(), signUpRequest.getUsername(),
 				signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
 
 		Set<UserRole> userRoles = new HashSet<>();
@@ -98,6 +102,7 @@ public class LoginController {
 			userRoles.add(new UserRole(user, role));
 		});
 		user.setUserRoles(userRoles);
+		user.setAccount(accountService.createAccount());
 		userRepo.save(user);
 		response.setMessage("User Registered Successfully!");
 		response.setSuccess(true);

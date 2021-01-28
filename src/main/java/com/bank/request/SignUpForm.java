@@ -12,7 +12,7 @@ import lombok.Data;
 public class SignUpForm {
     @NotBlank
     @Size(min = 3, max = 50)
-    private String firsName;
+    private String firstName;
     
     @NotBlank
     @Size(min = 3, max = 50)

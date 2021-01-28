@@ -1,9 +1,5 @@
 package com.bank.service.impl;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.bank.dao.UserDAO;
 import com.bank.model.User;
-import com.bank.model.UserRole;
 import com.bank.repository.UserRepo;
 import com.bank.service.UserService;
 
