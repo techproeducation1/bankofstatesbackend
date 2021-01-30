@@ -7,4 +7,6 @@ public interface UserService {
  
 	UserDAO getUserDAO(User user);
 	
+	UserDAO getUserDAOByName(String userName);
+	
 }
