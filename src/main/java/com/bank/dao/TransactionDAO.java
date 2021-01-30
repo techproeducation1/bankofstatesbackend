@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class TransactionDAO {
+	private Long id;
 	private String date;
 	private String description;
 	private String type;

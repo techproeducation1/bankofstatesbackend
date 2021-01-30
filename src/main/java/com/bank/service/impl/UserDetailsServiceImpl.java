@@ -71,6 +71,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 	
 	private TransactionDAO getTransactionDAO(Transaction transaction) {
 		TransactionDAO transactionDAO = new TransactionDAO();
+		transaction.setId(transaction.getId());
 		transactionDAO.setDate(getDateAsString(transaction.getDate(), SIMPLE_DATE_TIME_FORMAT));
 		transactionDAO.setAmount(transaction.getAmount());
 		transactionDAO.setAvailableBalance(transaction.getAvailableBalance());
