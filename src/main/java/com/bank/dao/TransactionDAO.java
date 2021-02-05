@@ -9,6 +9,7 @@ import lombok.Data;
 public class TransactionDAO {
 	private Long id;
 	private String date;
+	private String time;
 	private String description;
 	private String type;
 	private double amount;

@@ -1,7 +1,8 @@
 package com.bank.service.impl;
 
-import static com.bank.util.DateUtil.getDateAsString;
+import static com.bank.util.DateUtil.SIMPLE_DATE_FORMAT;
 import static com.bank.util.DateUtil.SIMPLE_DATE_TIME_FORMAT;
+import static com.bank.util.DateUtil.getDateAsString;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,8 @@ import com.bank.repository.TransactionRepo;
 import com.bank.repository.UserRepo;
 import com.bank.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
@@ -31,9 +34,11 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 	TransactionRepo transactionRepo;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username)
+			throws UsernameNotFoundException {
 		User user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with  username  " + username));
+				.orElseThrow(() -> new UsernameNotFoundException(
+						"User Not Found with  username  " + username));
 		return user;
 	}
 
@@ -46,14 +51,16 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 		userDAO.setLastName(user.getLastName());
 		userDAO.setEmail(user.getEmail());
 		userDAO.setPhone(user.getPhone());
-		Boolean isAdmin = user.getUserRoles().stream().filter(role -> role.getRole().getName().equals("admin"))
+		Boolean isAdmin = user.getUserRoles().stream()
+				.filter(role -> role.getRole().getName().equals("admin"))
 				.findAny().isPresent();
 		userDAO.setIsAdmin(isAdmin);
 		if (user.getAccount() != null) {
 			userDAO.setAccountNumber(user.getAccount().getAccountNumber());
 			userDAO.setAccountBalance(user.getAccount().getAccountBalance());
 		}
-		List<TransactionDAO> transactions = user.getAccount().getTransactions().stream().map(this::getTransactionDAO)
+		List<TransactionDAO> transactions = user.getAccount().getTransactions()
+				.stream().map(this::getTransactionDAO)
 				.collect(Collectors.toList());
 		userDAO.setTransactions(transactions);
 		return userDAO;
@@ -68,16 +75,35 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 		}
 		return userDAO;
 	}
-	
+
 	private TransactionDAO getTransactionDAO(Transaction transaction) {
 		TransactionDAO transactionDAO = new TransactionDAO();
 		transaction.setId(transaction.getId());
-		transactionDAO.setDate(getDateAsString(transaction.getDate(), SIMPLE_DATE_TIME_FORMAT));
+		transactionDAO.setDate(
+				getDateAsString(transaction.getDate(), SIMPLE_DATE_FORMAT));
+		transactionDAO.setTime(getDateAsString(transaction.getDate(),
+				SIMPLE_DATE_TIME_FORMAT));
 		transactionDAO.setAmount(transaction.getAmount());
 		transactionDAO.setAvailableBalance(transaction.getAvailableBalance());
 		transactionDAO.setDescription(transaction.getDescription());
 		transactionDAO.setType(transaction.getType());
 		transactionDAO.setIsTransfer(transaction.getIsTransfer());
 		return transactionDAO;
+	}
+
+	@Override
+	public List<UserDAO> getAllUsers() {
+		List<User> users = userRepo.findAll();
+		return users.stream().map(this::transformUser)
+				.collect(Collectors.toList());
+	}
+
+	private UserDAO transformUser(User user) {
+		UserDAO userDAO = new UserDAO();
+		userDAO.setUserId(user.getUserId());
+		userDAO.setFirstName(user.getFirstName());
+		userDAO.setLastName(user.getLastName());
+		userDAO.setEmail(user.getEmail());
+		return userDAO;
 	}
 }

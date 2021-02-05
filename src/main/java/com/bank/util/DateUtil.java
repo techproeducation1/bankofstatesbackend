@@ -9,6 +9,7 @@ public class DateUtil {
 	}
 
 	public static final String SIMPLE_DATE_TIME_FORMAT = "dd/MM/yyyy hh:mm a";
+	public static final String SIMPLE_DATE_FORMAT = "dd/MM/yyyy";
 
 	public static String getDateAsString(Date date, String pattern) {
 		SimpleDateFormat format = new SimpleDateFormat(pattern);

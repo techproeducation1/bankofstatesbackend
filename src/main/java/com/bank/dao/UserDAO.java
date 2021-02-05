@@ -3,11 +3,13 @@ package com.bank.dao;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.bank.model.Transaction;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.Data;
 
 @Data
+@JsonInclude(Include.NON_NULL)
 public class UserDAO {
 	private Long userId;
 	private String username;
