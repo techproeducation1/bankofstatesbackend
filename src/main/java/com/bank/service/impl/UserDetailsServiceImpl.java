@@ -24,8 +24,6 @@ import com.bank.repository.TransactionRepo;
 import com.bank.repository.UserRepo;
 import com.bank.service.UserService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
@@ -65,8 +63,9 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 				.stream().map(this::getTransactionDAO)
 				.collect(Collectors.toList());
 		userDAO.setTransactions(transactions);
-		user.getRecipients().stream().map(this::getRecipientDAO)
+		List<RecipientDAO> recipients = user.getRecipients().stream().map(this::getRecipientDAO)
 				.collect(Collectors.toList());
+		userDAO.setRecipients(recipients);
 		return userDAO;
 	}
 
@@ -118,7 +117,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 		recipientDAO.setEmail(recipient.getEmail());
 		recipientDAO.setPhone(recipient.getPhone());
 		recipientDAO.setBankName(recipient.getBankName());
-		recipientDAO.setIBanNumber(recipient.getIBanNumber());
+		recipientDAO.setBankNumber(recipient.getBankNumber());
 		return recipientDAO;
 	}
 }

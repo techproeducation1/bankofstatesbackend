@@ -9,5 +9,5 @@ public class RecipientDAO {
 	private String email;
 	private Integer phone;
 	private String bankName;
-	private String iBanNumber;
+	private String bankNumber;
 }

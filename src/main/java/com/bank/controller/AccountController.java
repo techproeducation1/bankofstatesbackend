@@ -17,6 +17,7 @@ import com.bank.model.Recipient;
 import com.bank.model.User;
 import com.bank.request.RecipientForm;
 import com.bank.request.TransactionRequest;
+import com.bank.request.TransferRequest;
 import com.bank.response.TransactionResponse;
 import com.bank.service.AccountService;
 import com.bank.service.UserService;
@@ -68,11 +69,28 @@ public class AccountController {
 				.getAuthentication().getPrincipal();
 		Recipient recipient = new Recipient(request.getName(),
 				request.getEmail(), request.getPhone(), request.getBankName(),
-				request.getIBanNumber());
+				request.getBankNumber());
 		recipient.setUser(user);
 		accountService.saveRecipient(recipient);
+		response.setMessage("Recipient successfully added");
+		response.setSuccess(true);
+		UserDAO userDAO = userService.getUserDAOByName(user.getUsername());
+		response.setUser(userDAO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
-
+	}
+	
+	@PostMapping("/transfer")
+	public ResponseEntity<TransactionResponse> transfer(
+			@Valid @RequestBody TransferRequest request) {
+		TransactionResponse response = new TransactionResponse();
+		User user = (User) SecurityContextHolder.getContext()
+				.getAuthentication().getPrincipal();
+		accountService.transfer(request, user);
+		response.setMessage("Amount Transferred Successfully");
+		response.setSuccess(true);
+		UserDAO userDAO = userService.getUserDAOByName(user.getUsername());
+		response.setUser(userDAO);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 }

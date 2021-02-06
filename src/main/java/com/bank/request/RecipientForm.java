@@ -21,5 +21,5 @@ public class RecipientForm {
 	private String bankName;
 	@NotBlank
 	@Size(min = 3, max = 20)
-	private String iBanNumber;
+	private String bankNumber;
 }

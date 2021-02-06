@@ -14,6 +14,7 @@ import com.bank.model.Transaction;
 import com.bank.model.User;
 import com.bank.repository.RecipientRepo;
 import com.bank.request.TransactionRequest;
+import com.bank.request.TransferRequest;
 import com.bank.service.AccountService;
 import com.bank.service.TransactionService;
 import com.bank.util.TransactionType;
@@ -79,4 +80,18 @@ public class AccountServiceImpl implements AccountService {
 		return random;
 	}
 
+	@Override
+	public void transfer(TransferRequest request, User user) {
+		Account account = user.getAccount();
+		Double amount = request.getAmount();
+		account.setAccountBalance(
+				account.getAccountBalance().subtract(new BigDecimal(amount)));
+		accountDAO.save(account);
+		Date date = new Date();
+		Transaction transaction = new Transaction(date,
+				"Transferred to " + request.getRecipientName(),
+				TransactionType.TRANSFER.toString(), amount,
+				account.getAccountBalance(), true, account);
+		transactionService.saveTransaction(transaction);
+	}
 }

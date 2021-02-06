@@ -21,7 +21,11 @@ public class Recipient {
 	private String email;
 	private Integer phone;
 	private String bankName;
-	private String iBanNumber;
+	private String bankNumber;
+
+	public Recipient() {
+
+	}
 
 	public Recipient(String name, String email, Integer phone, String bankName,
 			String iBanNumber) {
@@ -30,7 +34,7 @@ public class Recipient {
 		this.email = email;
 		this.phone = phone;
 		this.bankName = bankName;
-		this.iBanNumber = iBanNumber;
+		this.bankNumber = iBanNumber;
 	}
 
 	@ManyToOne
