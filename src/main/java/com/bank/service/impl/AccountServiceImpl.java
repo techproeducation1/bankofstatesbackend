@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.bank.dao.AccountDAO;
 import com.bank.model.Account;
+import com.bank.model.Recipient;
 import com.bank.model.Transaction;
 import com.bank.model.User;
+import com.bank.repository.RecipientRepo;
 import com.bank.request.TransactionRequest;
 import com.bank.service.AccountService;
 import com.bank.service.TransactionService;
@@ -21,6 +23,9 @@ public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private AccountDAO accountDAO;
+
+	@Autowired
+	private RecipientRepo recipientRepo;
 
 	@Autowired
 	private TransactionService transactionService;
@@ -62,10 +67,16 @@ public class AccountServiceImpl implements AccountService {
 		transactionService.saveTransaction(transaction);
 	}
 
+	@Override
+	public void saveRecipient(Recipient recipient) {
+		recipientRepo.save(recipient);
+	}
+
 	private Long getAccountNumber() {
 		long smallest = 1000_0000_0000_0000L;
 		long biggest = 9999_9999_9999_9999L;
 		long random = ThreadLocalRandom.current().nextLong(smallest, biggest);
 		return random;
 	}
+
 }

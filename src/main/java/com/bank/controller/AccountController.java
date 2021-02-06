@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bank.dao.UserDAO;
+import com.bank.model.Recipient;
 import com.bank.model.User;
+import com.bank.request.RecipientForm;
 import com.bank.request.TransactionRequest;
 import com.bank.response.TransactionResponse;
 import com.bank.service.AccountService;
@@ -56,6 +58,21 @@ public class AccountController {
 		UserDAO userDAO = userService.getUserDAOByName(user.getUsername());
 		response.setUser(userDAO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping("/addRecipient")
+	public ResponseEntity<TransactionResponse> addRecipient(
+			@Valid @RequestBody RecipientForm request) {
+		TransactionResponse response = new TransactionResponse();
+		User user = (User) SecurityContextHolder.getContext()
+				.getAuthentication().getPrincipal();
+		Recipient recipient = new Recipient(request.getName(),
+				request.getEmail(), request.getPhone(), request.getBankName(),
+				request.getIBanNumber());
+		recipient.setUser(user);
+		accountService.saveRecipient(recipient);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+
 	}
 
 }

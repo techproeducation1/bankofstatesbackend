@@ -2,6 +2,7 @@ package com.bank.model;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -49,8 +50,12 @@ public class User implements UserDetails {
 
 	@OneToOne
 	private Account account;
-	
-	public User(String firstName, String lastName , String username, String email, String password) {
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Recipient> recipients;
+
+	public User(String firstName, String lastName, String username,
+			String email, String password) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.username = username;
@@ -61,7 +66,8 @@ public class User implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Set<GrantedAuthority> authorities = new HashSet<>();
-		userRoles.forEach(ur -> authorities.add(new Authority(ur.getRole().getName())));
+		userRoles.forEach(
+				ur -> authorities.add(new Authority(ur.getRole().getName())));
 		return authorities;
 	}
 
