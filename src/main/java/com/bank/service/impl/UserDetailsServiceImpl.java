@@ -63,8 +63,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 				.stream().map(this::getTransactionDAO)
 				.collect(Collectors.toList());
 		userDAO.setTransactions(transactions);
-		List<RecipientDAO> recipients = user.getRecipients().stream().map(this::getRecipientDAO)
-				.collect(Collectors.toList());
+		List<RecipientDAO> recipients = user.getRecipients().stream().map(this::getRecipientDAO).collect(Collectors.toList());
 		userDAO.setRecipients(recipients);
 		return userDAO;
 	}
@@ -101,6 +100,18 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 				.collect(Collectors.toList());
 	}
 
+	@Override
+	public List<RecipientDAO> getRecipients(String userName) {
+		List<RecipientDAO> recipientList = null;
+		Optional<User> userOptional = userRepo.findByUsername(userName);
+		if (userOptional.isPresent()) {
+			User user = userOptional.get();
+			recipientList = user.getRecipients().stream()
+					.map(this::getRecipientDAO).collect(Collectors.toList());
+		}
+		return recipientList;
+	}
+
 	private UserDAO transformUser(User user) {
 		UserDAO userDAO = new UserDAO();
 		userDAO.setUserId(user.getUserId());
@@ -120,4 +131,5 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 		recipientDAO.setBankNumber(recipient.getBankNumber());
 		return recipientDAO;
 	}
+
 }

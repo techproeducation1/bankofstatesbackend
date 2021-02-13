@@ -18,7 +18,7 @@ public class UserDAO {
 	private String email;
 	private String phone;
 	private Boolean isAdmin;
-	private Long accountNumber;
+	private Long accountNumber; 
 	private BigDecimal accountBalance;
 	private List<TransactionDAO> transactions;
 	private List<RecipientDAO> recipients;

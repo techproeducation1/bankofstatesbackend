@@ -72,7 +72,7 @@ public class AccountController {
 				request.getBankNumber());
 		recipient.setUser(user);
 		accountService.saveRecipient(recipient);
-		response.setMessage("Recipient successfully added");
+		response.setMessage("Recipient added successfully");
 		response.setSuccess(true);
 		UserDAO userDAO = userService.getUserDAOByName(user.getUsername());
 		response.setUser(userDAO);
