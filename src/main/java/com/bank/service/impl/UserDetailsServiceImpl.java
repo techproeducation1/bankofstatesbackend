@@ -55,16 +55,28 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 				.filter(role -> role.getRole().getName().equals("admin"))
 				.findAny().isPresent();
 		userDAO.setIsAdmin(isAdmin);
-		if (user.getAccount() != null) {
-			userDAO.setAccountNumber(user.getAccount().getAccountNumber());
-			userDAO.setAccountBalance(user.getAccount().getAccountBalance());
+		if (isAdmin) {
+			List<Transaction> transactions = transactionRepo.findAll();
+			List<TransactionDAO> transactionDAOs = transactions.stream()
+					.map(this::getTransactionDAO).collect(Collectors.toList());
+			userDAO.setTransactions(transactionDAOs);
+			userDAO.setTotalUsers(userRepo.count());
+		} else {
+
+			if (user.getAccount() != null) {
+				userDAO.setAccountNumber(user.getAccount().getAccountNumber());
+				userDAO.setAccountBalance(
+						user.getAccount().getAccountBalance());
+			}
+			List<TransactionDAO> transactions = user.getAccount()
+					.getTransactions().stream().map(this::getTransactionDAO)
+					.collect(Collectors.toList());
+			userDAO.setTransactions(transactions);
+			List<RecipientDAO> recipients = user.getRecipients().stream()
+					.map(this::getRecipientDAO).collect(Collectors.toList());
+			userDAO.setRecipients(recipients);
+
 		}
-		List<TransactionDAO> transactions = user.getAccount().getTransactions()
-				.stream().map(this::getTransactionDAO)
-				.collect(Collectors.toList());
-		userDAO.setTransactions(transactions);
-		List<RecipientDAO> recipients = user.getRecipients().stream().map(this::getRecipientDAO).collect(Collectors.toList());
-		userDAO.setRecipients(recipients);
 		return userDAO;
 	}
 
