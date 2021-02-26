@@ -17,9 +17,11 @@ import org.springframework.stereotype.Service;
 import com.bank.dao.RecipientDAO;
 import com.bank.dao.TransactionDAO;
 import com.bank.dao.UserDAO;
+import com.bank.model.Account;
 import com.bank.model.Recipient;
 import com.bank.model.Transaction;
 import com.bank.model.User;
+import com.bank.repository.AccountRepo;
 import com.bank.repository.TransactionRepo;
 import com.bank.repository.UserRepo;
 import com.bank.service.UserService;
@@ -32,13 +34,14 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
 	@Autowired
 	TransactionRepo transactionRepo;
+	
+	@Autowired
+	AccountRepo accountRepo;
 
 	@Override
-	public UserDetails loadUserByUsername(String username)
-			throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException(
-						"User Not Found with  username  " + username));
+				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with  username  " + username));
 		return user;
 	}
 
@@ -51,31 +54,37 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 		userDAO.setLastName(user.getLastName());
 		userDAO.setEmail(user.getEmail());
 		userDAO.setPhone(user.getPhone());
-		Boolean isAdmin = user.getUserRoles().stream()
-				.filter(role -> role.getRole().getName().equals("admin"))
+		Boolean isAdmin = user.getUserRoles().stream().filter(role -> role.getRole().getName().equals("admin"))
 				.findAny().isPresent();
 		userDAO.setIsAdmin(isAdmin);
 		if (isAdmin) {
 			List<Transaction> transactions = transactionRepo.findAll();
 			List<TransactionDAO> transactionDAOs = transactions.stream()
-					.map(this::getTransactionDAO).collect(Collectors.toList());
+					.map(this::getTransactionDAO)
+					.collect(Collectors.toList());
 			userDAO.setTransactions(transactionDAOs);
-			userDAO.setTotalUsers(userRepo.count());
-		} else {
+			userDAO.setTotalUsers(userRepo.count()); 
+			List<Account> accounts = accountRepo.findAll();
+			Double totalBalance = accounts.stream().mapToDouble(account -> 
+			account.getAccountBalance().doubleValue()).sum();
+			userDAO.setTotalBalance(totalBalance);
 
+		} else {
 			if (user.getAccount() != null) {
 				userDAO.setAccountNumber(user.getAccount().getAccountNumber());
-				userDAO.setAccountBalance(
-						user.getAccount().getAccountBalance());
-			}
-			List<TransactionDAO> transactions = user.getAccount()
-					.getTransactions().stream().map(this::getTransactionDAO)
-					.collect(Collectors.toList());
-			userDAO.setTransactions(transactions);
-			List<RecipientDAO> recipients = user.getRecipients().stream()
-					.map(this::getRecipientDAO).collect(Collectors.toList());
-			userDAO.setRecipients(recipients);
+				userDAO.setAccountBalance(user.getAccount().getAccountBalance());
 
+				// Convert Transaction into Transaction DAO
+				List<TransactionDAO> transactions = user.getAccount().getTransactions().stream()
+						.map(this::getTransactionDAO)// Method reference
+						.collect(Collectors.toList());
+				userDAO.setTransactions(transactions);
+
+				// Add Recipients details
+				List<RecipientDAO> recipients = user.getRecipients().stream().map(this::getRecipientDAO)
+						.collect(Collectors.toList());
+				userDAO.setRecipients(recipients);
+			}
 		}
 		return userDAO;
 	}
@@ -90,38 +99,10 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 		return userDAO;
 	}
 
-	private TransactionDAO getTransactionDAO(Transaction transaction) {
-		TransactionDAO transactionDAO = new TransactionDAO();
-		transaction.setId(transaction.getId());
-		transactionDAO.setDate(
-				getDateAsString(transaction.getDate(), SIMPLE_DATE_FORMAT));
-		transactionDAO.setTime(getDateAsString(transaction.getDate(),
-				SIMPLE_DATE_TIME_FORMAT));
-		transactionDAO.setAmount(transaction.getAmount());
-		transactionDAO.setAvailableBalance(transaction.getAvailableBalance());
-		transactionDAO.setDescription(transaction.getDescription());
-		transactionDAO.setType(transaction.getType());
-		transactionDAO.setIsTransfer(transaction.getIsTransfer());
-		return transactionDAO;
-	}
-
 	@Override
 	public List<UserDAO> getAllUsers() {
 		List<User> users = userRepo.findAll();
-		return users.stream().map(this::transformUser)
-				.collect(Collectors.toList());
-	}
-
-	@Override
-	public List<RecipientDAO> getRecipients(String userName) {
-		List<RecipientDAO> recipientList = null;
-		Optional<User> userOptional = userRepo.findByUsername(userName);
-		if (userOptional.isPresent()) {
-			User user = userOptional.get();
-			recipientList = user.getRecipients().stream()
-					.map(this::getRecipientDAO).collect(Collectors.toList());
-		}
-		return recipientList;
+		return users.stream().map(this::transformUser).collect(Collectors.toList());
 	}
 
 	private UserDAO transformUser(User user) {
@@ -131,6 +112,19 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 		userDAO.setLastName(user.getLastName());
 		userDAO.setEmail(user.getEmail());
 		return userDAO;
+	}
+
+	private TransactionDAO getTransactionDAO(Transaction transaction) {
+		TransactionDAO dao = new TransactionDAO();
+		dao.setId(transaction.getId());
+		dao.setDate(getDateAsString(transaction.getDate(), SIMPLE_DATE_FORMAT));
+		dao.setTime(getDateAsString(transaction.getDate(), SIMPLE_DATE_TIME_FORMAT));
+		dao.setAmount(transaction.getAmount());
+		dao.setAvailableBalance(transaction.getAvailableBalance());
+		dao.setDescription(transaction.getDescription());
+		dao.setType(transaction.getType());
+		dao.setIsTransfer(transaction.getIsTransfer());
+		return dao;
 	}
 
 	private RecipientDAO getRecipientDAO(Recipient recipient) {
@@ -144,4 +138,8 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 		return recipientDAO;
 	}
 
+	@Override
+	public void deleteUser(Long id) {
+		userRepo.deleteById(id); 
+	}
 }
